@@ -1,5 +1,5 @@
-import React, {useState} from 'react';
-import { Switch, Route, Redirect } from 'react-router-dom';
+import React from 'react';
+import { Switch, Route, Redirect, withRouter } from 'react-router-dom'
 import Menu from './MenuComponent';
 import Header from './HeaderComponent';
 import Footer from './FooterComponent';
@@ -7,17 +7,10 @@ import Home from './HomeComponent';
 import Contact from './ContactComponent';
 import DishDetail from './DishdetailComponent';
 import About from './AboutComponent';
-import {DISHES} from '../shared/dishes';
-import { COMMENTS } from '../shared/comments';
-import { PROMOTIONS } from '../shared/promotions';
-import { LEADERS } from '../shared/leaders';
+import { connect } from 'react-redux';
 
-function Main() {
 
-  const [dishes, setDishes] = useState(DISHES);
-  const [comments, setComments] = useState(COMMENTS);
-  const [promotions, setPromotions] = useState(PROMOTIONS);
-  const [leaders, setLeaders] = useState(LEADERS)
+function Main({dishes,promotions,leaders,comments}) {
 
   const HomePage = () => {
     return(
@@ -49,5 +42,12 @@ function Main() {
     </div>
   );
 }
-
-export default Main;
+const mapStateToProps = state => {
+  return {
+    dishes: state.dishes,
+    comments: state.comments,
+    promotions: state.promotions,
+    leaders: state.leaders
+  }
+}
+export default withRouter(connect(mapStateToProps)(Main));
