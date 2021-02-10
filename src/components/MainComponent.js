@@ -33,7 +33,7 @@ function Main({dishes,promotions,leaders,comments}) {
     <Switch>
         <Route path="/home" component={HomePage} />
         <Route exact path='/menu' component={()=><Menu dishes={dishes}/>} />
-        <Route exact path='/contactus' component={Contact}/>
+        <Route exact path='/contactus' component={()=><Contact/>}/>
         <Route path='/menu/:dishId' component={DishWithId} />
         <Route path='/aboutus' component={()=><About leaders={leaders}/>}/>
         <Redirect to="/home" />
