@@ -18,6 +18,7 @@ import {
 } from "reactstrap";
 import { Control, LocalForm, Errors } from "react-redux-form";
 import { Link } from "react-router-dom";
+import { Loading } from './LoadingComponent';
 
 const required = val => val && val.length;
 const maxLength = len => val => !val || val.length <= len;
@@ -28,10 +29,12 @@ class CommentForm extends Component {
     super(props);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.toggleModal = this.toggleModal.bind(this);
+    
     this.state = {
       isModalOpen: false
     };
   }
+ 
 
   toggleModal() {
     this.setState({
@@ -39,23 +42,21 @@ class CommentForm extends Component {
     });
   }
 
-  handleSubmit(values) {
-    this.toggleModal()
-    console.log("Current State is:" + JSON.stringify(values));
-    alert("Current State is:" + JSON.stringify(values));
-    
+ handleSubmit(values) {
+    this.toggleModal();
+    this.props.addComment(this.props.dishId, values.rating, values.author, values.comment);
   }
 
   render() {
     return (
-      <div>
+      <div >
         <Button outline onClick={this.toggleModal}>
           <span className="fa fa-pencil fa-lg" /> Submit Comment
         </Button>
         <Modal isOpen={this.state.isModalOpen} toggle={this.toggleModal}>
           <ModalHeader toggle={this.toggleModal}>Submit comment</ModalHeader>
           <ModalBody>
-            <LocalForm onSubmit={values => this.handleSubmit(values)}>
+            <LocalForm onSubmit={(values) => this.handleSubmit(values)}>
               <FormGroup>
                 <Label htmlFor="rating">Rating</Label>
                 <Control.select
@@ -118,11 +119,11 @@ class CommentForm extends Component {
   }
 }
 
-function RenderComments({ comments }) {
+function RenderComments({ comments,addComment,dishId }) {
   if (comments !== null && comments.length !== 0) {
     const commentsList = comments.map(comment => {
       return (
-        <li>
+        <li key={comment.id}>
           <p>{comment.comment}</p>
           <p>
             -- {comment.author},
@@ -140,7 +141,7 @@ function RenderComments({ comments }) {
       <div>
         <h4>Comments</h4>
         <ul className="list-unstyled">{commentsList}</ul>
-        <CommentForm />
+        <CommentForm dishId={dishId} addComment={addComment}/>
       </div>
     );
   } else {
@@ -161,7 +162,25 @@ function RenderDish({ dish }) {
 }
 
 const DishDetail = props => {
-  if (props.dish != null) {
+  if (props.isLoading) {
+    return(
+        <div className="container">
+            <div className="row">            
+                <Loading />
+            </div>
+        </div>
+    );
+}
+else if (props.errMess) {
+    return(
+        <div className="container">
+            <div className="row">            
+                <h4>{props.errMess}</h4>
+            </div>
+        </div>
+    );
+}
+  else if (props.dish != null) {
     return (
       <div className="container">
         <div className="row">
@@ -181,13 +200,15 @@ const DishDetail = props => {
             <RenderDish dish={props.dish} />
           </div>
           <div className="col-12 col-md-5 m-1">
-            <RenderComments comments={props.comments} />
+            <RenderComments comments={props.comments} 
+                addComment={props.addComment}
+                dishId={props.dish.id}/>
           </div>
         </div>
       </div>
     );
   } else {
-    return <div />;
+    return <div></div>;
   }
 };
 
